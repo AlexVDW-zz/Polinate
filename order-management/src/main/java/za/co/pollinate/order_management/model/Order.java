@@ -1,7 +1,6 @@
 package za.co.pollinate.order_management.model;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -11,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
