@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,11 +15,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import za.co.pollinate.order_management.dto.ProductDTO;
+
 import java.util.List;
+
 import za.co.pollinate.order_management.dto.CreateProductResponse;
 import za.co.pollinate.order_management.dto.ErrorResponse;
 import za.co.pollinate.order_management.service.ProductServiceImpl;
+
 import org.springframework.http.ResponseEntity;
+
+import jakarta.validation.Valid;
 import za.co.pollinate.order_management.dto.BaseResponse;
 import za.co.pollinate.order_management.dto.CreateProductRequest;
 
@@ -46,7 +52,7 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/create-product")
-    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(CreateProductRequest createProductRequest) {
+    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(@Valid CreateProductRequest createProductRequest) {
         try {
             log.info("Received request to create product: {}", createProductRequest);
             Long productId = productService.createProduct(createProductRequest.getName(), createProductRequest.getPrice());

@@ -11,10 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import za.co.pollinate.order_management.dto.OrderDTO;
-import za.co.pollinate.order_management.dto.ProductDTO;
 import za.co.pollinate.order_management.dto.CreateOrderResponse;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
 import za.co.pollinate.order_management.service.OrderServiceImpl;
@@ -47,7 +47,7 @@ public class OrderController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/create-order")
-    public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(CreateOrderRequest createOrderRequest) {
+    public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(@Valid CreateOrderRequest createOrderRequest) {
         try {
             log.info("Received request to create order: {}", createOrderRequest);
             Long orderId = orderService.createOrder(createOrderRequest);
