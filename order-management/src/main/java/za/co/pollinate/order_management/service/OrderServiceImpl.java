@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final ProductRepository productRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository, ProductServiceImpl productService) {
+    public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
     }
