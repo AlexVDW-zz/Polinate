@@ -26,11 +26,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    @Column(name = "total_price", nullable = false)
+    private BigDecimal totalPrice;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
