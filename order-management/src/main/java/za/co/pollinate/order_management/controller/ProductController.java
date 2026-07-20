@@ -1,10 +1,34 @@
+package za.co.pollinate.order_management.controller;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import za.co.pollinate.order_management.dto.ProductDTO;
+import java.util.List;
+import za.co.pollinate.order_management.dto.CreateProductResponse;
+import za.co.pollinate.order_management.dto.ErrorResponse;
+import za.co.pollinate.order_management.service.ProductService;
+import org.springframework.http.ResponseEntity;
+import za.co.pollinate.order_management.dto.BaseResponse;
 
 @RestController
 @RequestMapping("/api/products")
 @Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @Operation(summary = "Create a new product", description = "Creates a new product in the system")
     @ApiResponses(value = {
@@ -19,11 +43,18 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/create-product")
-    public CreateProductResponse createProduct(ProductDTO productDTO) {
-        // Simulate product creation logic
-        Long productId = 1L; // Replace with actual product ID
-        String message = "Product created successfully!";
-        return new CreateProductResponse(productId, message);
+    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(ProductDTO productDTO) {
+        try {
+            Long productId = productService.createProduct(productDTO);
+            String message = "Product created successfully!";
+            CreateProductResponse response = new CreateProductResponse(productId, message);
+            BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(null, response);
+            return ResponseEntity.ok(baseResponse);
+        } catch (RuntimeException e) {
+            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_CREATION_FAILED", e.getMessage());
+            BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(errorResponse, null);
+            return ResponseEntity.status(500).body(baseResponse);
+        }
     }
 
     @Operation(summary = "Get product by ID", description = "Retrieves a product by its ID")
@@ -39,8 +70,16 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/get-product/{id}")
-    public ProductDTO getProduct(@PathVariable Long id) {
-        return new ProductDTO();
+    public ResponseEntity<BaseResponse<ProductDTO>> getProduct(@PathVariable Long id) {
+        try {
+            ProductDTO productDTO = productService.getProductById(id);
+            BaseResponse<ProductDTO> baseResponse = new BaseResponse<>(null, productDTO);
+            return ResponseEntity.ok(baseResponse);
+        } catch (RuntimeException e) {
+            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_NOT_FOUND", e.getMessage());
+            BaseResponse<ProductDTO> baseResponse = new BaseResponse<>(errorResponse, null);
+            return ResponseEntity.status(404).body(baseResponse);
+        }
     }
 
     @Operation(summary = "List all products", description = "Retrieves a list of all products")
@@ -53,7 +92,15 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/list-products")
-    public List<ProductDTO> getAllProducts() {
-        return Arrays.asList(new ProductDTO());
+    public ResponseEntity<BaseResponse<List<ProductDTO>>> getAllProducts() {
+        try {
+            List<ProductDTO> products = productService.getAllProducts();
+            BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>(null, products);
+            return ResponseEntity.ok(baseResponse);
+        } catch (RuntimeException e) {
+            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_LIST_RETRIEVAL_FAILED", e.getMessage());
+            BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>(errorResponse, null);
+            return ResponseEntity.status(500).body(baseResponse);
+        }
     }
 }
