@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import za.co.pollinate.order_management.dto.OrderDTO;
+import za.co.pollinate.order_management.dto.ProductDTO;
 import za.co.pollinate.order_management.dto.CreateOrderResponse;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
 import za.co.pollinate.order_management.service.OrderServiceImpl;
@@ -23,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@Slf4j
 @Tag(name = "Order Controller", description = "APIs for managing orders")
 public class OrderController {
         private final OrderServiceImpl orderService;
@@ -46,12 +49,16 @@ public class OrderController {
     @PostMapping("/create-order")
     public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(CreateOrderRequest createOrderRequest) {
         try {
+            log.info("Received request to create order: {}", createOrderRequest);
             Long orderId = orderService.createOrder(createOrderRequest);
             String message = "Order created successfully!";
             CreateOrderResponse response = new CreateOrderResponse(orderId, message);
             BaseResponse<CreateOrderResponse> baseResponse = new BaseResponse<>(null, response);
+            
+            log.info("Order created successfully with ID: {}", orderId);
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+            log.error("Error occurred while creating order", e);
             ErrorResponse errorResponse = new ErrorResponse("ORDER_CREATION_FAILED", e.getMessage());
             BaseResponse<CreateOrderResponse> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(500).body(baseResponse);
@@ -73,10 +80,14 @@ public class OrderController {
     @GetMapping("/get-order/{id}")
     public ResponseEntity<BaseResponse<OrderDTO>> getOrder(@PathVariable Long id) {
         try {
+            log.info("Received request to get order with ID: {}", id);
             OrderDTO orderDTO = orderService.getOrderById(id);
+
             BaseResponse<OrderDTO> baseResponse = new BaseResponse<>(null, orderDTO);
+            log.info("Order retrieved successfully with ID: {}", id);
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+            log.error("Error occurred while retrieving order", e);
             ErrorResponse errorResponse = new ErrorResponse("ORDER_NOT_FOUND", e.getMessage());
             BaseResponse<OrderDTO> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(404).body(baseResponse);
@@ -95,10 +106,13 @@ public class OrderController {
     @GetMapping("/list-orders")
     public ResponseEntity<BaseResponse<List<OrderDTO>>> getAllOrders() {
         try {
+            log.info("Received request to list all orders");
             List<OrderDTO> orders = orderService.getAllOrders();
             BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>(null, orders);
+            log.info("Orders listed successfully");
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+            log.error("Error occurred while listing orders", e);
             ErrorResponse errorResponse = new ErrorResponse("ORDER_LIST_RETRIEVAL_FAILED", e.getMessage());
             BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(500).body(baseResponse);
