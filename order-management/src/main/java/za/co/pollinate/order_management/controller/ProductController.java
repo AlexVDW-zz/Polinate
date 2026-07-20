@@ -16,17 +16,18 @@ import za.co.pollinate.order_management.dto.ProductDTO;
 import java.util.List;
 import za.co.pollinate.order_management.dto.CreateProductResponse;
 import za.co.pollinate.order_management.dto.ErrorResponse;
-import za.co.pollinate.order_management.service.ProductService;
+import za.co.pollinate.order_management.service.ProductServiceImpl;
 import org.springframework.http.ResponseEntity;
 import za.co.pollinate.order_management.dto.BaseResponse;
+import za.co.pollinate.order_management.dto.CreateProductRequest;
 
 @RestController
 @RequestMapping("/api/products")
 @Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceImpl productService) {
         this.productService = productService;
     }
 
@@ -43,9 +44,9 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/create-product")
-    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(ProductDTO productDTO) {
+    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(CreateProductRequest createProductRequest) {
         try {
-            Long productId = productService.createProduct(productDTO);
+            Long productId = productService.createProduct(createProductRequest.getName(), createProductRequest.getPrice());
             String message = "Product created successfully!";
             CreateProductResponse response = new CreateProductResponse(productId, message);
             BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(null, response);
