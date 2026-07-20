@@ -1,27 +1,25 @@
 package za.co.pollinate.order_management.service;
 
 import org.springframework.stereotype.Service;
-
 import za.co.pollinate.order_management.model.OrderItem;
 import za.co.pollinate.order_management.model.Order;
 import za.co.pollinate.order_management.model.Product;
 import za.co.pollinate.order_management.dto.OrderDTO;
 import za.co.pollinate.order_management.dto.OrderItemDTO;
 import za.co.pollinate.order_management.dto.ProductDTO;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
-
 import za.co.pollinate.order_management.repository.OrderRepository;
 import za.co.pollinate.order_management.repository.ProductRepository;
-
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
 import za.co.pollinate.order_management.exception.NotFoundException;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -36,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public Long createOrder(CreateOrderRequest request) {
+        log.info("Started creating order with inputs: {}", request);    
+
         Order newOrder = new Order();
 
         List<OrderItem> orderItems = request.getCartItems().stream()
@@ -44,7 +44,9 @@ public class OrderServiceImpl implements OrderService {
                     
                     Product product = productRepository.findById(itemDTO.getProductId()).orElse(null);
                     if(product == null) {
-                        throw new NotFoundException("Product not found with id: " + itemDTO.getProductId());
+                        String errorMessage = "Error while creating order. Product with ID: " + itemDTO.getProductId() + " does not exist.";
+                        log.error(errorMessage);    
+                        throw new NotFoundException(errorMessage);
                     }
 
                     orderItem.setProduct(product);
@@ -63,12 +65,19 @@ public class OrderServiceImpl implements OrderService {
 
         newOrder.setOrderItems(orderItems);
         newOrder.setTotalPrice(totalPrice);
-        return orderRepository.save(newOrder).getId();
+
+        orderRepository.save(newOrder);
+
+        log.info("Order created successfully with ID: {}", newOrder.getId());    
+
+        return newOrder.getId();
     }
 
     @Transactional(readOnly = true)
     @Override
     public OrderDTO getOrderById(Long id) {
+        log.info("Started order lookup using orderId: {}", id);    
+
         return orderRepository.findById(id)
         .map(order -> {
             List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
@@ -79,7 +88,11 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toList());
             return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
         })
-        .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
+        .orElseThrow(() -> {
+            String errorMessage = "Order not found with id: " + id;
+            log.error(errorMessage);
+            return new NotFoundException(errorMessage);
+        });
     }
 
     @Transactional(readOnly = true)
