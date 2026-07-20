@@ -2,6 +2,7 @@ package za.co.pollinate.order_management.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -15,4 +16,5 @@ public class OrderDTO implements Serializable {
     private Long id;
     private List<OrderItemDTO> orderItems;
     private BigDecimal totalPrice;
+    private LocalDateTime createdAt;
 }

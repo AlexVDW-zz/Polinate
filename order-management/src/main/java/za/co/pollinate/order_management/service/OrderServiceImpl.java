@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
                             orderItem.getQuantity()
                     ))
                     .collect(Collectors.toList());
-            return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice());
+            return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
         })
         .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
     }
@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
                             ))
                             .collect(Collectors.toList());
 
-                    return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice());
+                    return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
                 })
                 .collect(Collectors.toList());
     }

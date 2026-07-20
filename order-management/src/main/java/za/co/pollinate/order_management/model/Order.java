@@ -2,6 +2,9 @@ package za.co.pollinate.order_management.model;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,4 +35,8 @@ public class Order {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade=CascadeType.ALL)
     private List<OrderItem> orderItems;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable=false)
+    private LocalDateTime createdAt;
 }
