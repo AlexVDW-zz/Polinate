@@ -1,6 +1,7 @@
 package za.co.pollinate.order_management.dto;
 
 import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateProductResponse implements Serializable {
-    private Long productId;
-    private String message;
+    private Long orderId;
+    private String message; 
 }
