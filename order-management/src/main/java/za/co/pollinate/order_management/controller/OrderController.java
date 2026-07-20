@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import za.co.pollinate.order_management.dto.OrderDTO;
 import za.co.pollinate.order_management.dto.CreateOrderResponse;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
-import za.co.pollinate.order_management.service.OrderServiceImpl;
+import za.co.pollinate.order_management.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import za.co.pollinate.order_management.dto.ErrorResponse;
 import za.co.pollinate.order_management.dto.BaseResponse;
@@ -28,9 +28,9 @@ import java.util.List;
 @Slf4j
 @Tag(name = "Order Controller", description = "APIs for managing orders")
 public class OrderController {
-        private final OrderServiceImpl orderService;
+        private final OrderService orderService;
 
-        public OrderController(OrderServiceImpl orderService) {
+        public OrderController(OrderService orderService) {
             this.orderService = orderService;
         }
 

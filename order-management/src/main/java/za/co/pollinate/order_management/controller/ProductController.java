@@ -20,7 +20,7 @@ import java.util.List;
 
 import za.co.pollinate.order_management.dto.CreateProductResponse;
 import za.co.pollinate.order_management.dto.ErrorResponse;
-import za.co.pollinate.order_management.service.ProductServiceImpl;
+import za.co.pollinate.order_management.service.ProductService;
 
 import org.springframework.http.ResponseEntity;
 
@@ -33,9 +33,9 @@ import za.co.pollinate.order_management.dto.CreateProductRequest;
 @RequestMapping("/api/products")
 @Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
-    private final ProductServiceImpl productService;
+    private final ProductService productService;
 
-    public ProductController(ProductServiceImpl productService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
