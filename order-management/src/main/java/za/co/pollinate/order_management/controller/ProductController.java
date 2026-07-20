@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import za.co.pollinate.order_management.dto.ProductDTO;
 import java.util.List;
@@ -22,6 +23,7 @@ import za.co.pollinate.order_management.dto.BaseResponse;
 import za.co.pollinate.order_management.dto.CreateProductRequest;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/products")
 @Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
@@ -46,12 +48,15 @@ public class ProductController {
     @PostMapping("/create-product")
     public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(CreateProductRequest createProductRequest) {
         try {
+            log.info("Received request to create product: {}", createProductRequest);
             Long productId = productService.createProduct(createProductRequest.getName(), createProductRequest.getPrice());
             String message = "Product created successfully!";
             CreateProductResponse response = new CreateProductResponse(productId, message);
             BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(null, response);
+            log.info("Product created successfully with ID: {}", productId);
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+            log.error("Error occurred while creating order", e);
             ErrorResponse errorResponse = new ErrorResponse("PRODUCT_CREATION_FAILED", e.getMessage());
             BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(500).body(baseResponse);
@@ -73,10 +78,16 @@ public class ProductController {
     @GetMapping("/get-product/{id}")
     public ResponseEntity<BaseResponse<ProductDTO>> getProduct(@PathVariable Long id) {
         try {
+            log.info("Received request to lookup product using id: {}", id);
+            
             ProductDTO productDTO = productService.getProductById(id);
+            
             BaseResponse<ProductDTO> baseResponse = new BaseResponse<>(null, productDTO);
+            
+            log.info("Successfully retrieved product with id {} : {}", id, productDTO);
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+                 log.error("Error occurred while retrieving all orders", e);
             ErrorResponse errorResponse = new ErrorResponse("PRODUCT_NOT_FOUND", e.getMessage());
             BaseResponse<ProductDTO> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(404).body(baseResponse);
@@ -95,10 +106,15 @@ public class ProductController {
     @GetMapping("/list-products")
     public ResponseEntity<BaseResponse<List<ProductDTO>>> getAllProducts() {
         try {
+            log.info("Received request to lookup all products");
+            
             List<ProductDTO> products = productService.getAllProducts();
             BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>(null, products);
+            
+            log.info("Successfully retrieved all products");
             return ResponseEntity.ok(baseResponse);
         } catch (RuntimeException e) {
+            log.error("Error occurred while retrieving all orders", e);
             ErrorResponse errorResponse = new ErrorResponse("PRODUCT_LIST_RETRIEVAL_FAILED", e.getMessage());
             BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>(errorResponse, null);
             return ResponseEntity.status(500).body(baseResponse);
