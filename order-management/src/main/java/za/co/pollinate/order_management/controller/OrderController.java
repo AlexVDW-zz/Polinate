@@ -30,11 +30,11 @@ import java.util.List;
 @Slf4j
 @Tag(name = "Order Controller", description = "APIs for managing orders")
 public class OrderController {
-        private final OrderService orderService;
+    private final OrderService orderService;
 
-        public OrderController(OrderService orderService) {
-            this.orderService = orderService;
-        }
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @Operation(summary = "Create a new order", description = "Creates a new order in the system")
     @ApiResponses(value = {
@@ -50,21 +50,14 @@ public class OrderController {
     })
     @PostMapping("/create-order")
     public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
-        try {
-            log.info("Received request to create order: {}", createOrderRequest);
-            Long orderId = orderService.createOrder(createOrderRequest);
-            String message = "Order created successfully!";
-            CreateOrderResponse response = new CreateOrderResponse(orderId, message);
-            BaseResponse<CreateOrderResponse> baseResponse = new BaseResponse<>(null, response);
+        log.info("Received request to create order: {}", createOrderRequest);
+        Long orderId = orderService.createOrder(createOrderRequest);
+        String message = "Order created successfully!";
+        CreateOrderResponse response = new CreateOrderResponse(orderId, message);
+        BaseResponse<CreateOrderResponse> baseResponse = new BaseResponse<>(null, response);
             
-            log.info("Order created successfully with ID: {}", orderId);
-            return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-            log.error("Error occurred while creating order", e);
-            ErrorResponse errorResponse = new ErrorResponse("ORDER_CREATION_FAILED", e.getMessage());
-            BaseResponse<CreateOrderResponse> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(500).body(baseResponse);
-        }
+        log.info("Order created successfully with ID: {}", orderId);
+        return ResponseEntity.ok(baseResponse);
     }
 
     @Operation(summary = "Get order by ID", description = "Retrieves an order by its ID")
@@ -81,19 +74,12 @@ public class OrderController {
     })
     @GetMapping("/get-order/{id}")
     public ResponseEntity<BaseResponse<OrderDTO>> getOrder(@PathVariable Long id) {
-        try {
-            log.info("Received request to get order with ID: {}", id);
-            OrderDTO orderDTO = orderService.getOrderById(id);
+        log.info("Received request to get order with ID: {}", id);
+        OrderDTO orderDTO = orderService.getOrderById(id);
 
-            BaseResponse<OrderDTO> baseResponse = new BaseResponse<>(null, orderDTO);
-            log.info("Order retrieved successfully with ID: {}", id);
-            return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-            log.error("Error occurred while retrieving order", e);
-            ErrorResponse errorResponse = new ErrorResponse("ORDER_NOT_FOUND", e.getMessage());
-            BaseResponse<OrderDTO> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(404).body(baseResponse);
-        }
+        BaseResponse<OrderDTO> baseResponse = new BaseResponse<>(null, orderDTO);
+        log.info("Order retrieved successfully with ID: {}", id);
+        return ResponseEntity.ok(baseResponse);
     }
 
     @Operation(summary = "List all orders", description = "Retrieves a list of all orders")
@@ -107,17 +93,10 @@ public class OrderController {
     })
     @GetMapping("/list-orders")
     public ResponseEntity<BaseResponse<List<OrderDTO>>> getAllOrders() {
-        try {
-            log.info("Received request to list all orders");
-            List<OrderDTO> orders = orderService.getAllOrders();
-            BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>(null, orders);
-            log.info("Orders listed successfully");
-            return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-            log.error("Error occurred while listing orders", e);
-            ErrorResponse errorResponse = new ErrorResponse("ORDER_LIST_RETRIEVAL_FAILED", e.getMessage());
-            BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(500).body(baseResponse);
-        }
+        log.info("Received request to list all orders");
+        List<OrderDTO> orders = orderService.getAllOrders();
+        BaseResponse<List<OrderDTO>> baseResponse = new BaseResponse<>(null, orders);
+        log.info("Orders listed successfully");
+        return ResponseEntity.ok(baseResponse);
     }
 }

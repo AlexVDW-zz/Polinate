@@ -1,6 +1,7 @@
 package za.co.pollinate.order_management.service;
 
 import za.co.pollinate.order_management.dto.ProductDTO;
+import za.co.pollinate.order_management.exception.NotFoundException;
 import za.co.pollinate.order_management.model.Product;
 import za.co.pollinate.order_management.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
+    @Override
     public Long createProduct(String name, BigDecimal price) {
         Product newProduct = new Product();
         newProduct.setName(name);
@@ -27,13 +29,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public ProductDTO getProductById(Long id) {
         return productRepository.findById(id)
                 .map(product -> new ProductDTO(product.getId(), product.getName(), product.getPrice()))
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(product -> new ProductDTO(product.getId(), product.getName(), product.getPrice()))

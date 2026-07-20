@@ -54,7 +54,6 @@ public class ProductController {
     })
     @PostMapping("/create-product")
     public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(@Valid @RequestBody CreateProductRequest createProductRequest) {
-        try {
             log.info("Received request to create product: {}", createProductRequest);
             Long productId = productService.createProduct(createProductRequest.getName(), createProductRequest.getPrice());
             String message = "Product created successfully!";
@@ -62,12 +61,6 @@ public class ProductController {
             BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(null, response);
             log.info("Product created successfully with ID: {}", productId);
             return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-            log.error("Error occurred while creating order", e);
-            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_CREATION_FAILED", e.getMessage());
-            BaseResponse<CreateProductResponse> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(500).body(baseResponse);
-        }
     }
 
     @Operation(summary = "Get product by ID", description = "Retrieves a product by its ID")
@@ -84,7 +77,6 @@ public class ProductController {
     })
     @GetMapping("/get-product/{id}")
     public ResponseEntity<BaseResponse<ProductDTO>> getProduct(@PathVariable Long id) {
-        try {
             log.info("Received request to lookup product using id: {}", id);
             
             ProductDTO productDTO = productService.getProductById(id);
@@ -93,12 +85,6 @@ public class ProductController {
             
             log.info("Successfully retrieved product with id {} : {}", id, productDTO);
             return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-                 log.error("Error occurred while retrieving all orders", e);
-            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_NOT_FOUND", e.getMessage());
-            BaseResponse<ProductDTO> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(404).body(baseResponse);
-        }
     }
 
     @Operation(summary = "List all products", description = "Retrieves a list of all products")
@@ -112,7 +98,6 @@ public class ProductController {
     })
     @GetMapping("/list-products")
     public ResponseEntity<BaseResponse<List<ProductDTO>>> getAllProducts() {
-        try {
             log.info("Received request to lookup all products");
             
             List<ProductDTO> products = productService.getAllProducts();
@@ -120,11 +105,5 @@ public class ProductController {
             
             log.info("Successfully retrieved all products");
             return ResponseEntity.ok(baseResponse);
-        } catch (RuntimeException e) {
-            log.error("Error occurred while retrieving all orders", e);
-            ErrorResponse errorResponse = new ErrorResponse("PRODUCT_LIST_RETRIEVAL_FAILED", e.getMessage());
-            BaseResponse<List<ProductDTO>> baseResponse = new BaseResponse<>(errorResponse, null);
-            return ResponseEntity.status(500).body(baseResponse);
-        }
     }
 }

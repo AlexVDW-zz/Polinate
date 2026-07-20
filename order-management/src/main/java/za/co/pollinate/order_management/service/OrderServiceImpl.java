@@ -1,6 +1,7 @@
 package za.co.pollinate.order_management.service;
 
 import org.springframework.stereotype.Service;
+
 import za.co.pollinate.order_management.model.OrderItem;
 import za.co.pollinate.order_management.model.Order;
 import za.co.pollinate.order_management.model.Product;
@@ -18,6 +19,7 @@ import za.co.pollinate.order_management.repository.ProductRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
+import za.co.pollinate.order_management.exception.NotFoundException;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -32,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
+    @Override
     public Long createOrder(CreateOrderRequest request) {
         Order newOrder = new Order();
 
@@ -41,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
                     
                     Product product = productRepository.findById(itemDTO.getProductId()).orElse(null);
                     if(product == null) {
-                        throw new RuntimeException("Product not found with id: " + itemDTO.getProductId());
+                        throw new NotFoundException("Product not found with id: " + itemDTO.getProductId());
                     }
 
                     orderItem.setProduct(product);
@@ -64,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public OrderDTO getOrderById(Long id) {
         return orderRepository.findById(id)
         .map(order -> {
@@ -75,10 +79,11 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toList());
             return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice());
         })
-        .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+        .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(order -> {
