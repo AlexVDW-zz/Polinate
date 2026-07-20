@@ -23,6 +23,7 @@ import za.co.pollinate.order_management.dto.ErrorResponse;
 import za.co.pollinate.order_management.service.ProductService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import jakarta.validation.Valid;
 import za.co.pollinate.order_management.dto.BaseResponse;
@@ -52,7 +53,7 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/create-product")
-    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(@Valid CreateProductRequest createProductRequest) {
+    public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(@Valid @RequestBody CreateProductRequest createProductRequest) {
         try {
             log.info("Received request to create product: {}", createProductRequest);
             Long productId = productService.createProduct(createProductRequest.getName(), createProductRequest.getPrice());
