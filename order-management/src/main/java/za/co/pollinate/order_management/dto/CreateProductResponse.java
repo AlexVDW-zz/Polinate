@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateProductResponse implements Serializable {
-    private Long orderId;
+    private Long productId;
     private String message; 
 }
