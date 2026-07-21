@@ -101,7 +101,7 @@ public class OrderController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/list-orders")
-    @Cacheable(value = "allOrders", key = "#page - #size")
+    @Cacheable(value = "allOrders", key = "#page '-' #size")
     public ResponseEntity<BaseResponse<List<OrderDTO>>> getAllOrders(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Received request to list all orders");
