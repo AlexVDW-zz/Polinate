@@ -55,7 +55,7 @@ public class OrderController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @CacheEvict(value = "allOrders", key = "'all-orders'")
+    @CacheEvict(value = "allOrders", allEntries = true)
     @PostMapping("/create-order")
     public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
         log.info("Received request to create order: {}", createOrderRequest);
@@ -101,7 +101,7 @@ public class OrderController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/list-orders")
-    @Cacheable(value = "allOrders", key = "'all-orders'")
+    @Cacheable(value = "allOrders", key = "#page - #size")
     public ResponseEntity<BaseResponse<List<OrderDTO>>> getAllOrders(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Received request to list all orders");
