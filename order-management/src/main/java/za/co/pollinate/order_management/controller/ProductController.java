@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,6 +54,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @CacheEvict(value = "allProducts", key = "'all-products'")
     @PostMapping("/create-product")
     public ResponseEntity<BaseResponse<CreateProductResponse>> createProduct(@Valid @RequestBody CreateProductRequest createProductRequest) {
             log.info("Received request to create product: {}", createProductRequest);
@@ -75,6 +78,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @Cacheable(value = "products", key = "#id") 
     @GetMapping("/get-product/{id}")
     public ResponseEntity<BaseResponse<ProductDTO>> getProduct(@PathVariable Long id) {
             log.info("Received request to lookup product using id: {}", id);
@@ -97,6 +101,7 @@ public class ProductController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/list-products")
+    @Cacheable(value = "allProducts", key = "'all-products'")
     public ResponseEntity<BaseResponse<List<ProductDTO>>> getAllProducts() {
             log.info("Received request to lookup all products");
             
