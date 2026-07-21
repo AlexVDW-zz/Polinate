@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import lombok.extern.slf4j.Slf4j;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
@@ -68,11 +69,11 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setOrderItems(orderItems);
         newOrder.setTotalPrice(totalPrice);
 
-        orderRepository.save(newOrder);
+        Order savedOrder = orderRepository.save(newOrder);
 
-        log.info("Order created successfully with ID: {}", newOrder.getId());    
+        log.info("Order created successfully with ID: {}", savedOrder.getId());    
 
-        return newOrder.getId();
+        return savedOrder.getId();
     }
 
     @Transactional(readOnly = true)
@@ -110,6 +111,29 @@ public class OrderServiceImpl implements OrderService {
         log.info("Started retrieving all orders");    
 
         List<OrderDTO> orders = orderRepository.findAll().stream()
+                .map(order -> {
+                    List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
+                            .map(orderItem -> new OrderItemDTO(
+                                    new ProductDTO(orderItem.getProduct().getId(), orderItem.getProduct().getName(), orderItem.getProduct().getPrice()),
+                                    orderItem.getQuantity()
+                            ))
+                            .collect(Collectors.toList());
+
+                    return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
+                })
+                .collect(Collectors.toList());
+
+        log.info("Successfully retrieved all orders");
+
+        return orders;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<OrderDTO> getAllOrders(Pageable pageable) {
+        log.info("Started retrieving all orders");    
+
+        List<OrderDTO> orders = orderRepository.findAll(pageable).stream()
                 .map(order -> {
                     List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
                             .map(orderItem -> new OrderItemDTO(

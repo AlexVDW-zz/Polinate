@@ -56,7 +56,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.totalPrice", is(30.0)))
                 .andExpect(jsonPath("$.data.orderItems.length()", is(1)))
                 .andExpect(jsonPath("$.data.orderItems[0].quantity", is(3)))
-                .andExpect(jsonPath("$.data.orderItems[0].product.name", is("Widget")));
+                .andExpect(jsonPath("$.data.orderItems[0].product.name", is("Test")));
     }
 
     @Test

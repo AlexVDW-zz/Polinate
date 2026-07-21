@@ -36,16 +36,20 @@ class ProductServiceImplTest {
         final String name = "";
         final BigDecimal price = new BigDecimal("9.99");
 
-        Product saved = new Product(1L, name, price);
-        when(productRepository.save(any(Product.class))).thenReturn(saved);
+        Product saved = new Product();
+        saved.setId(99L);
+
+        when(productRepository.save(any(Product.class)))
+            .thenReturn(saved);
 
         Long id = productService.createProduct(name, price);
 
-        assertThat(id).isEqualTo(saved.getId());
         verify(productRepository).save(argThat(x -> {
             return x.getName().equals(name)
                     && x.getPrice().equals(price);
         }));
+
+        assertThat(id).isEqualTo(saved.getId());
     }
 
     @Test

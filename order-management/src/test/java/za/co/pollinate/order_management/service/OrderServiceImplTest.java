@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -56,7 +57,7 @@ class OrderServiceImplTest {
 
         assertThat(orderId).isEqualTo(100L);
 
-        var orderCaptor = org.mockito.ArgumentCaptor.forClass(Order.class);
+        ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
         verify(orderRepository).save(orderCaptor.capture());
         Order savedOrder = orderCaptor.getValue();
 
@@ -92,11 +93,11 @@ class OrderServiceImplTest {
 
         OrderDTO dto = orderService.getOrderById(order.getId());
 
-        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getId()).isEqualTo(order.getId());
         assertThat(dto.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
         assertThat(dto.getOrderItems()).hasSize(1);
         assertThat(dto.getCreatedAt()).isEqualTo(order.getCreatedAt());
-        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(order.getOrderItems().size());
+        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(item.getQuantity());
         assertThat(dto.getOrderItems().get(0).getProduct().getName()).isEqualTo(product.getName());
     }
 

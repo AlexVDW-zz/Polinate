@@ -48,13 +48,17 @@ All responses are wrapped in a `BaseResponse` envelope: `{ "data": ..., "error":
 
 ![Order Management DB ERD](design/ERD.png)
 
-- `product` — `name` (varchar), `price` (BigDecimal)
-- `orders` — `total_price` (BigDecimal), stored on the order for fast lookup rather than recalculated from items on every read
+- `product` - `name` (varchar), `price` (BigDecimal)
+- `orders` - `createdAt` (Timestamp), `total_price` (BigDecimal), stored on the order for fast lookup rather than recalculated from items on every read
 - `orderitem` — join table linking an order to a product, with its own `quantity`; this models the many-to-many relationship between `orders` and `product` (one order can contain many products, one product can appear on many orders)
 
 ## Assumptions & design notes
 
 - Product prices are captured at order-creation time and baked into the order's `totalPrice`; changing a product's price later does not retroactively change existing orders.
+- No update or delete functionality for Order or Product
 - An order must contain at least one cart item; empty carts are rejected with a `400 VALIDATION_ERROR`.
 - A single shared Basic Auth user (from config) is used for all endpoints, since the spec calls for "a simple authentication mechanism."
-- H2 runs in-memory (`jdbc:h2:mem:testdb`) and the schema is (re)created on every startup
+- H2 runs in-memory (`jdbc:h2:mem:testdb`) and the schema is recreated on every startup
+- Caching added on Orders and Product getById and getAll calls
+- Pagination applied only on Orders
+
