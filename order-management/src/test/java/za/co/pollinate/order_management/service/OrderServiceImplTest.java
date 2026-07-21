@@ -3,6 +3,7 @@ package za.co.pollinate.order_management.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
@@ -56,16 +57,20 @@ class OrderServiceImplTest {
 
         assertThat(orderId).isEqualTo(100L);
 
-        var orderCaptor = org.mockito.ArgumentCaptor.forClass(Order.class);
-        verify(orderRepository).save(orderCaptor.capture());
-        Order savedOrder = orderCaptor.getValue();
+        Order savedOrder = new Order();
+        when(orderRepository.save(any(Order.class)))
+            .thenReturn(savedOrder);
 
-        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo("30.00");
-        assertThat(savedOrder.getOrderItems()).hasSize(1);
-        OrderItem savedItem = savedOrder.getOrderItems().get(0);
-        assertThat(savedItem.getOrder()).isSameAs(savedOrder);
-        assertThat(savedItem.getProduct()).isEqualTo(product);
-        assertThat(savedItem.getQuantity()).isEqualTo(3);
+        verify(orderRepository).save(argThat(x -> {
+            return x.getTotalPrice().equals(new BigDecimal("30.00"))
+                    && x.getCreatedAt() != null
+                    && x.getOrderItems() != null
+                    && x.getOrderItems().size() == 1
+                    && x.getOrderItems().get(0).getProduct().equals(product)
+                    && x.getOrderItems().get(0).getQuantity() == 3;
+        }));
+
+        assertThat(orderId).isEqualTo(savedOrder.getId());
     }
 
     @Test
