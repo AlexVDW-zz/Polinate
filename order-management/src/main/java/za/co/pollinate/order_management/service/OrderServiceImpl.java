@@ -80,13 +80,20 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findById(id)
         .map(order -> {
+            log.info("Found order {id}. Mapping Order Items", id);
             List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
                     .map(orderItem -> new OrderItemDTO(
                             new ProductDTO(orderItem.getProduct().getId(), orderItem.getProduct().getName(), orderItem.getProduct().getPrice()),
                             orderItem.getQuantity()
                     ))
                     .collect(Collectors.toList());
-            return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
+            log.info("Successfully mapped order {id}.", id);
+            
+            OrderDTO orderDTO = new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
+
+            log.info("Successfully looked up order using orderId: {}", id);    
+
+            return orderDTO;
         })
         .orElseThrow(() -> {
             String errorMessage = "Order not found with id: " + id;
@@ -98,7 +105,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream()
+        log.info("Started retrieving all orders");    
+
+        List<OrderDTO> orders = orderRepository.findAll().stream()
                 .map(order -> {
                     List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
                             .map(orderItem -> new OrderItemDTO(
@@ -110,5 +119,9 @@ public class OrderServiceImpl implements OrderService {
                     return new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
                 })
                 .collect(Collectors.toList());
+
+        log.info("Successfully retrieved all orders");
+
+        return orders;
     }
 }
