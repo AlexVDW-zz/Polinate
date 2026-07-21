@@ -1,15 +1,17 @@
 package za.co.pollinate.order_management.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 import za.co.pollinate.order_management.dto.ProductDTO;
 import za.co.pollinate.order_management.exception.NotFoundException;
 import za.co.pollinate.order_management.model.Product;
 import za.co.pollinate.order_management.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-import java.util.stream.Collectors;
-import java.util.List;
-import java.math.BigDecimal;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -39,10 +41,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     @Override
     public ProductDTO getProductById(Long id) {
-        log.info("Started order lookup using orderId: {}", id);    
+        log.info("Started product lookup using id: {}", id);    
 
 
-        return productRepository.findById(id)
+        ProductDTO productDTO = productRepository.findById(id)
                 .map(product -> new ProductDTO(product.getId(), product.getName(), product.getPrice()))
                 .orElseThrow(() -> {
                     String errorMessage = "Product with ID: " + id + " does not exist.";
@@ -50,7 +52,11 @@ public class ProductServiceImpl implements ProductService {
                     return new NotFoundException("Product not found with id: " + id);
                     }
                 );
-    }
+
+            log.info("Successfully looked up product using id: {} - {}", id, productDTO);    
+
+            return productDTO;
+        }
 
     @Transactional(readOnly = true)
     @Override
