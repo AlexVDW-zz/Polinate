@@ -89,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
                             orderItem.getQuantity()
                     ))
                     .collect(Collectors.toList());
-            log.info("Successfully mapped order {id}.", id);
+            log.info("Successfully mapped order {}.", id);
             
             OrderDTO orderDTO = new OrderDTO(order.getId(), orderItemDTOs, order.getTotalPrice(), order.getCreatedAt());
 
