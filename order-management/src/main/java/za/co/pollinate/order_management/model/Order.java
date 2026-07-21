@@ -1,8 +1,8 @@
 package za.co.pollinate.order_management.model;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -32,7 +32,7 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orders", cascade=CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade=CascadeType.ALL)
     private List<OrderItem> orderItems;
 
     @CreationTimestamp
