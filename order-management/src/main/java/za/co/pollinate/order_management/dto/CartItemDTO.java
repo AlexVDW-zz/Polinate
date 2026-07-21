@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemDTO implements Serializable {
-    @Min(value=1, message="Producy Id needs to be a positive integer value")
+    @Min(value=1, message="Product Id needs to be a positive integer value")
     private Long productId;
 
     @Min(value=1, message="Quantity needs to be a positive integer value")
