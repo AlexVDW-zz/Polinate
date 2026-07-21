@@ -1,22 +1,23 @@
 package za.co.pollinate.order_management.service;
 
-import org.springframework.stereotype.Service;
-import za.co.pollinate.order_management.model.OrderItem;
-import za.co.pollinate.order_management.model.Order;
-import za.co.pollinate.order_management.model.Product;
-import za.co.pollinate.order_management.dto.OrderDTO;
-import za.co.pollinate.order_management.dto.OrderItemDTO;
-import za.co.pollinate.order_management.dto.ProductDTO;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.math.BigDecimal;
-import za.co.pollinate.order_management.repository.OrderRepository;
-import za.co.pollinate.order_management.repository.ProductRepository;
+
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import za.co.pollinate.order_management.dto.CreateOrderRequest;
+import za.co.pollinate.order_management.dto.OrderDTO;
+import za.co.pollinate.order_management.dto.OrderItemDTO;
+import za.co.pollinate.order_management.dto.ProductDTO;
 import za.co.pollinate.order_management.exception.NotFoundException;
+import za.co.pollinate.order_management.model.Order;
+import za.co.pollinate.order_management.model.OrderItem;
+import za.co.pollinate.order_management.model.Product;
+import za.co.pollinate.order_management.repository.OrderRepository;
+import za.co.pollinate.order_management.repository.ProductRepository;
 
 @Service
 @Slf4j
@@ -51,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
 
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemDTO.getQuantity());
+                    orderItem.setOrder(newOrder);
 
                     return orderItem;
                 })
