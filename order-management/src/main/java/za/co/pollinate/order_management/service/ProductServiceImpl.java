@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 import java.util.List;
 import java.math.BigDecimal;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -22,25 +24,45 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public Long createProduct(String name, BigDecimal price) {
+        log.info("Started creating product with name: {}, price: {}", name, price);    
+
         Product newProduct = new Product();
         newProduct.setName(name);
         newProduct.setPrice(price);
-        return productRepository.save(newProduct).getId();
+        productRepository.save(newProduct);
+
+        log.info("Product created successfully with ID: {}", newProduct.getId());    
+
+        return newProduct.getId();
     }
 
     @Transactional(readOnly = true)
     @Override
     public ProductDTO getProductById(Long id) {
+        log.info("Started order lookup using orderId: {}", id);    
+
+
         return productRepository.findById(id)
                 .map(product -> new ProductDTO(product.getId(), product.getName(), product.getPrice()))
-                .orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> {
+                    String errorMessage = "Product with ID: " + id + " does not exist.";
+                    log.error(errorMessage); 
+                    return new NotFoundException("Product not found with id: " + id);
+                    }
+                );
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<ProductDTO> getAllProducts() {
-        return productRepository.findAll().stream()
+        log.info("Started retrieving all products");
+
+        List<ProductDTO> products = productRepository.findAll().stream()
                 .map(product -> new ProductDTO(product.getId(), product.getName(), product.getPrice()))
                 .collect(Collectors.toList());
+
+        log.info("Successfully retrieved all products");
+
+        return products;
     }
 }
