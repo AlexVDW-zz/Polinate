@@ -55,6 +55,10 @@ All responses are wrapped in a `BaseResponse` envelope: `{ "data": ..., "error":
 ## Assumptions & design notes
 
 - Product prices are captured at order-creation time and baked into the order's `totalPrice`; changing a product's price later does not retroactively change existing orders.
+- No update or delete functionality for Order or Product
 - An order must contain at least one cart item; empty carts are rejected with a `400 VALIDATION_ERROR`.
 - A single shared Basic Auth user (from config) is used for all endpoints, since the spec calls for "a simple authentication mechanism."
-- H2 runs in-memory (`jdbc:h2:mem:testdb`) and the schema is (re)created on every startup
+- H2 runs in-memory (`jdbc:h2:mem:testdb`) and the schema is recreated on every startup
+- Caching added on Orders and Product getById and getAll calls
+- Pagination applied only on Orders
+
