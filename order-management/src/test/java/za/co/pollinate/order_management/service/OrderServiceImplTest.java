@@ -92,11 +92,11 @@ class OrderServiceImplTest {
 
         OrderDTO dto = orderService.getOrderById(order.getId());
 
-        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getId()).isEqualTo(product.getId());
         assertThat(dto.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
-        assertThat(dto.getOrderItems()).hasSize(1);
+        assertThat(dto.getOrderItems()).hasSize(order.getOrderItems().size());
         assertThat(dto.getCreatedAt()).isEqualTo(order.getCreatedAt());
-        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(order.getOrderItems().size());
+        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(order.getOrderItems().get(0).getQuantity());
         assertThat(dto.getOrderItems().get(0).getProduct().getName()).isEqualTo(product.getName());
     }
 
