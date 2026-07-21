@@ -3,7 +3,6 @@ package za.co.pollinate.order_management.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
@@ -14,6 +13,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,27 +45,28 @@ class OrderServiceImplTest {
     void createOrder_calculatesTotalPriceAndLinksItemsToOrder() {
         Product product = new Product(1L, "Test", new BigDecimal("10.00"));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-        Order savedOrder = new Order(); 
-        savedOrder.setId(99L);
-
-        when(orderRepository.save(any(Order.class)))
-            .thenReturn(savedOrder);
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setId(100L);
+            return order;
+        });
 
         CreateOrderRequest request = new CreateOrderRequest(List.of(new CartItemDTO(1L, 3)));
 
         Long orderId = orderService.createOrder(request);
 
-        verify(orderRepository).save(argThat(x -> {
-            return x.getTotalPrice().equals(new BigDecimal("30.00"))
-                    && x.getCreatedAt() != null
-                    && x.getOrderItems() != null
-                    && x.getOrderItems().size() == 1
-                    && x.getOrderItems().get(0).getProduct().equals(product)
-                    && x.getOrderItems().get(0).getQuantity() == 3;
-        }));
+        assertThat(orderId).isEqualTo(100L);
 
-        assertThat(orderId).isEqualTo(savedOrder.getId());
+        ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+        verify(orderRepository).save(orderCaptor.capture());
+        Order savedOrder = orderCaptor.getValue();
+
+        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo("30.00");
+        assertThat(savedOrder.getOrderItems()).hasSize(1);
+        OrderItem savedItem = savedOrder.getOrderItems().get(0);
+        assertThat(savedItem.getOrder()).isSameAs(savedOrder);
+        assertThat(savedItem.getProduct()).isEqualTo(product);
+        assertThat(savedItem.getQuantity()).isEqualTo(3);
     }
 
     @Test
@@ -92,11 +93,11 @@ class OrderServiceImplTest {
 
         OrderDTO dto = orderService.getOrderById(order.getId());
 
-        assertThat(dto.getId()).isEqualTo(product.getId());
+        assertThat(dto.getId()).isEqualTo(order.getId());
         assertThat(dto.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
-        assertThat(dto.getOrderItems()).hasSize(order.getOrderItems().size());
+        assertThat(dto.getOrderItems()).hasSize(1);
         assertThat(dto.getCreatedAt()).isEqualTo(order.getCreatedAt());
-        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(order.getOrderItems().get(0).getQuantity());
+        assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(item.getQuantity());
         assertThat(dto.getOrderItems().get(0).getProduct().getName()).isEqualTo(product.getName());
     }
 
