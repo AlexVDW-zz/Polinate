@@ -11,3 +11,6 @@ spring.datasource.driverClassName: org.h2.Driver
 spring.datasource.username: admin
 spring.datasource.password: admin
 spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+
+logging.level.za.co.pollinate.order_management: INFO
+logging.level.org.springframework.web: WARN
