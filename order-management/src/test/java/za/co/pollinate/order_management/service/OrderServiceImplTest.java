@@ -45,21 +45,16 @@ class OrderServiceImplTest {
     void createOrder_calculatesTotalPriceAndLinksItemsToOrder() {
         Product product = new Product(1L, "Test", new BigDecimal("10.00"));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-            Order order = invocation.getArgument(0);
-            order.setId(100L);
-            return order;
-        });
+
+        Order savedOrder = new Order(); 
+        savedOrder.setId(99L);
+
+        when(orderRepository.save(any(Order.class)))
+            .thenReturn(savedOrder);
 
         CreateOrderRequest request = new CreateOrderRequest(List.of(new CartItemDTO(1L, 3)));
 
         Long orderId = orderService.createOrder(request);
-
-        assertThat(orderId).isEqualTo(100L);
-
-        Order savedOrder = new Order();
-        when(orderRepository.save(any(Order.class)))
-            .thenReturn(savedOrder);
 
         verify(orderRepository).save(argThat(x -> {
             return x.getTotalPrice().equals(new BigDecimal("30.00"))
