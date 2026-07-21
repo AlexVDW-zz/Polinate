@@ -36,8 +36,15 @@ class ProductServiceImplTest {
         final String name = "";
         final BigDecimal price = new BigDecimal("9.99");
 
-        Product saved = new Product(1L, name, price);
-        when(productRepository.save(any(Product.class))).thenReturn(saved);
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+            Product product = invocation.getArgument(0);
+            product.setId(99L);
+            return product;
+        });
+
+        var productCaptor = org.mockito.ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+        Product saved = productCaptor.getValue();
 
         Long id = productService.createProduct(name, price);
 
