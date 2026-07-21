@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,6 +50,7 @@ public class OrderController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @CacheEvict(value = "allOrders", key = "'all-orders'")
     @PostMapping("/create-order")
     public ResponseEntity<BaseResponse<CreateOrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
         log.info("Received request to create order: {}", createOrderRequest);
@@ -73,6 +76,7 @@ public class OrderController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/get-order/{id}")
+    @Cacheable(value = "orders", key = "#id") 
     public ResponseEntity<BaseResponse<OrderDTO>> getOrder(@PathVariable Long id) {
         log.info("Received request to get order with ID: {}", id);
         OrderDTO orderDTO = orderService.getOrderById(id);
@@ -92,6 +96,7 @@ public class OrderController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/list-orders")
+    @Cacheable(value = "allOrders", key = "'all-orders'")
     public ResponseEntity<BaseResponse<List<OrderDTO>>> getAllOrders() {
         log.info("Received request to list all orders");
         List<OrderDTO> orders = orderService.getAllOrders();
