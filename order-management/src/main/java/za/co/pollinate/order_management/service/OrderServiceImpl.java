@@ -70,11 +70,11 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setOrderItems(orderItems);
         newOrder.setTotalPrice(totalPrice);
 
-        orderRepository.save(newOrder);
+        Order savedOrder = orderRepository.save(newOrder);
 
-        log.info("Order created successfully with ID: {}", newOrder.getId());    
+        log.info("Order created successfully with ID: {}", savedOrder.getId());    
 
-        return newOrder.getId();
+        return savedOrder.getId();
     }
 
     @Transactional(readOnly = true)

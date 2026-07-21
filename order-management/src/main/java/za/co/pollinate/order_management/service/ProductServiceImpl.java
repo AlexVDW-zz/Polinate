@@ -31,11 +31,11 @@ public class ProductServiceImpl implements ProductService {
         Product newProduct = new Product();
         newProduct.setName(name);
         newProduct.setPrice(price);
-        productRepository.save(newProduct);
+        Product savedProduct = productRepository.save(newProduct);
 
-        log.info("Product created successfully with ID: {}", newProduct.getId());    
+        log.info("Product created successfully with ID: {}", savedProduct.getId());
 
-        return newProduct.getId();
+        return savedProduct.getId();
     }
 
     @Transactional(readOnly = true)
