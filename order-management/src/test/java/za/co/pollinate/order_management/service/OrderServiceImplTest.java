@@ -26,6 +26,7 @@ import za.co.pollinate.order_management.model.OrderItem;
 import za.co.pollinate.order_management.model.Product;
 import za.co.pollinate.order_management.repository.OrderRepository;
 import za.co.pollinate.order_management.repository.ProductRepository;
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -84,7 +85,7 @@ class OrderServiceImplTest {
     @Test
     void getOrderById_returnsDtoWhenFound() {
         Product product = new Product(1L, "Test", new BigDecimal("10.00"));
-        Order order = new Order(1L, new BigDecimal("20.00"), null);
+        Order order = new Order(1L, new BigDecimal("20.00"), null, LocalDateTime.now());
         OrderItem item = new OrderItem(1L, order, product, 2);
         order.setOrderItems(List.of(item));
         when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
@@ -94,6 +95,7 @@ class OrderServiceImplTest {
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
         assertThat(dto.getOrderItems()).hasSize(1);
+        assertThat(dto.getCreatedAt()).isEqualTo(order.getCreatedAt());
         assertThat(dto.getOrderItems().get(0).getQuantity()).isEqualTo(order.getOrderItems().size());
         assertThat(dto.getOrderItems().get(0).getProduct().getName()).isEqualTo(product.getName());
     }
